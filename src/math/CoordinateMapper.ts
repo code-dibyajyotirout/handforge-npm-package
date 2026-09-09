@@ -23,7 +23,10 @@ export class OneEuroFilter {
   }
 
   filter(val: number, timestamp: number = performance.now() / 1000): number {
-    if (this.lastTime === null) {
+    if (!Number.isFinite(val)) {
+      return Number.isFinite(this.x) ? this.x! : 0;
+    }
+    if (this.lastTime === null || !Number.isFinite(this.x)) {
       this.x = val;
       this.dx = 0;
       this.lastTime = timestamp;
@@ -60,6 +63,9 @@ export class OneEuroFilter3D {
   }
 
   filter(v: THREE.Vector3, ts?: number): THREE.Vector3 {
+    if (!v || !Number.isFinite(v.x) || !Number.isFinite(v.y) || !Number.isFinite(v.z)) {
+      return v || new THREE.Vector3();
+    }
     return new THREE.Vector3(
       this.filterX.filter(v.x, ts),
       this.filterY.filter(v.y, ts),
