@@ -5,6 +5,20 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.0.2] - 2026-09-10
+
+### Added
+- Single-Hand Focus Mode toggle switch to eliminate phantom ghost hands and accidental zooming in desktop webcam sessions.
+- In Single-Hand mode, solo gestures for orbit (fist) and uniform scale (two fingers) map directly to the primary hand.
+- Synchronized grayscale monochrome gesture guide icons in studio UI.
+
+## [1.0.1] - 2026-09-09
+
+### Fixed
+- Fixed runaway scale enlargement bug when sculpting with one hand.
+- Added finite number guards to `OneEuroFilter` to prevent NaN coordinate propagation.
+- Resolved React 19 strict-mode double-initialization in studio canvas.
+
 ## [1.0.0] - 2026-09-09
 
 ### Added

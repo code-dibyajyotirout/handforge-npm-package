@@ -22,6 +22,8 @@ export default function Studio() {
   const [activeMat, setActiveMat] = useState("clay");
   const [mobileTab, setMobileTab] = useState<"canvas" | "settings" | "vision">("canvas");
   const [spatialActive, setSpatialActive] = useState(true);
+  const [dualHandMode, setDualHandMode] = useState(false);
+  const dualHandModeRef = useRef(false);
   const stateRef = useRef({
     handDetected: false,
     isMouseDown: false,
@@ -462,7 +464,8 @@ export default function Studio() {
     }
 
     s.handDetected = true;
-    const hands = data.hands.allLandmarks;
+    const isDual = dualHandModeRef.current;
+    const hands = isDual ? data.hands.allLandmarks : data.hands.allLandmarks.slice(0, 1);
     let overall = data.pose?.landmarks ? "pose" : "hover";
 
     for (let h = 0; h < 2; h++) {
@@ -506,7 +509,24 @@ export default function Studio() {
 
       let hs = "hover";
       if (h === 0) {
-        if (g.state === "smooth") {
+        if (!isDual && g.state === "orbit") {
+          hs = "orbit";
+          overall = "orbit";
+          if (engine.sculptMesh && s.prevHand[0].lengthSq() > 0) {
+            const dx = Math.max(-0.08, Math.min(0.08, wp.x - s.prevHand[0].x));
+            const dy = Math.max(-0.08, Math.min(0.08, wp.y - s.prevHand[0].y));
+            engine.sculptMesh.rotation.y += dx * 2.5;
+            engine.sculptMesh.rotation.x += dy * 2.5;
+            engine.gizmo?.highlightAxis(Math.abs(dx) > Math.abs(dy) ? "y" : "x");
+          }
+        } else if (!isDual && g.state === "scale") {
+          hs = "sculpt";
+          overall = "resize";
+          if (engine.sculptMesh && s.prevHand[0].lengthSq() > 0) {
+            const dy = Math.max(-0.04, Math.min(0.04, wp.y - s.prevHand[0].y));
+            engine.sculptMesh.scale.setScalar(Math.max(0.5, Math.min(2.5, engine.sculptMesh.scale.x + dy * 1.2)));
+          }
+        } else if (g.state === "smooth") {
           hs = "smooth";
           overall = "smooth";
           const pm = engine.brushMode;
@@ -577,15 +597,15 @@ export default function Studio() {
     if (handCount === 0) {
       if (state === "fallback") {
         badge.textContent = "Offline"; badge.className = "badge badge-warning";
-        card.className = "gesture-card state-hover"; icon.textContent = "[FALLBACK]";
+        card.className = "gesture-card state-hover"; icon.textContent = "OFF";
         title.textContent = "FALLBACK ACTIVE"; desc.textContent = "Mouse, keyboard, and touch controls fully active";
       } else if (state === "pose") {
         badge.textContent = "Pose Tracking"; badge.className = "badge badge-info";
-        card.className = "gesture-card state-pose"; icon.textContent = "[RIG]";
+        card.className = "gesture-card state-pose"; icon.textContent = "RIG";
         title.textContent = "BODY RIGGING"; desc.textContent = "Live body skeletal coordinates driving mesh shape";
       } else {
         badge.textContent = "Wave Hands"; badge.className = "badge badge-warning";
-        card.className = "gesture-card state-hover"; icon.textContent = "[SCAN]";
+        card.className = "gesture-card state-hover"; icon.textContent = "SCAN";
         title.textContent = "WAITING"; desc.textContent = "Place hands in frame to sculpt, or use mouse";
       }
       return;
@@ -593,12 +613,12 @@ export default function Studio() {
 
     badge.textContent = handCount === 2 ? "Dual Hands" : "1 Hand"; badge.className = "badge badge-success";
     const map: Record<string, [string, string, string, string]> = {
-      resize: ["state-sculpt", "[SCALE]", "SPATIAL RESIZE", "Pinch Hand 2 to scale"],
-      orbit: ["state-sculpt", "[ORBIT]", "SPATIAL ORBIT", "Fist on Hand 2 — rotating model"],
-      sculpt: ["state-sculpt", "[SCULPT]", "SCULPTING", "Deforming mesh"],
-      smooth: ["state-smooth", "[SMOOTH]", "SMOOTHING", "Laplacian smooth pass"],
-      pose: ["state-pose", "[RIG]", "BODY RIG ACTIVE", "Skeletal movement deforming model"],
-      hover: ["state-hover", "[HOVER]", "HOVER", "Hand 1 sculpts, Hand 2 transforms"],
+      resize: ["state-sculpt", "SCALE", "SPATIAL RESIZE", "Pinch Hand 2 to scale"],
+      orbit: ["state-sculpt", "ORBIT", "SPATIAL ORBIT", "Fist on Hand 2 — rotating model"],
+      sculpt: ["state-sculpt", "SCULPT", "SCULPTING", "Deforming mesh"],
+      smooth: ["state-smooth", "SMOOTH", "SMOOTHING", "Laplacian smooth pass"],
+      pose: ["state-pose", "RIG", "BODY RIG ACTIVE", "Skeletal movement deforming model"],
+      hover: ["state-hover", "HOVER", "HOVER", "Hand 1 sculpts, Hand 2 transforms"],
     };
     const [cls, ic, t, d] = map[state] || map.hover;
     card.className = `gesture-card ${cls}`; icon.textContent = ic; title.textContent = t; desc.textContent = d;
@@ -780,7 +800,7 @@ export default function Studio() {
           <div className="panel-section">
             <h3>BRUSH TOOLS</h3>
             <div className="tool-grid">
-              {[["push","","Push"],["pull","","Carve"],["smooth","","Smooth"],["inflate","","Flatten"],["flatten","","Flatten"],["crease","","Crease"]].map(([mode, icon, name]) => (
+              {[["push","","Push"],["pull","","Carve"],["smooth","","Smooth"],["inflate","","Inflate"],["flatten","","Flatten"],["crease","","Crease"]].map(([mode, icon, name]) => (
                 <button key={mode} className={`tool-btn ${activeBrush === mode ? "active" : ""}`} onClick={() => handleBrush(mode)}>
                   {icon && <span className="tool-icon">{icon}</span>}
                   <span className="tool-name">{name}</span>
@@ -861,6 +881,31 @@ export default function Studio() {
               <h3>SPATIAL VISION</h3>
               <span id="hand-status-badge" className="badge badge-warning">Waiting</span>
             </div>
+
+            {spatialActive && (
+              <div className="hand-mode-toggle">
+                <button 
+                  className={`mode-btn ${!dualHandMode ? "active" : ""}`} 
+                  onClick={() => {
+                    setDualHandMode(false);
+                    dualHandModeRef.current = false;
+                    showToast("1 Hand Mode (Ghost-Free)");
+                  }}
+                >
+                  1 Hand (Focus)
+                </button>
+                <button 
+                  className={`mode-btn ${dualHandMode ? "active" : ""}`} 
+                  onClick={() => {
+                    setDualHandMode(true);
+                    dualHandModeRef.current = true;
+                    showToast("Dual Hand Mode (Bimanual)");
+                  }}
+                >
+                  Dual Hands
+                </button>
+              </div>
+            )}
             
             <button className={`dock-btn ${spatialActive ? "active" : ""}`} style={{ marginBottom: 8, width: "100%", justifyContent: "center" }} onClick={toggleSpatialMode}>
               {spatialActive ? "Disable Spatial AI Mode" : "Enable Spatial AI Mode"}
@@ -882,7 +927,7 @@ export default function Studio() {
           <div className="panel-section">
             <h3>GESTURE MONITOR</h3>
             <div id="gesture-card" className="gesture-card state-hover">
-              <div className="gesture-icon" id="gesture-icon">[HOVER]</div>
+              <div className="gesture-icon" id="gesture-icon">HOVER</div>
               <div><div className="gesture-title" id="gesture-title">HOVER</div><div className="gesture-desc" id="gesture-desc">Hand 1 sculpts, Hand 2 transforms</div></div>
             </div>
             <div className="meter-container">
