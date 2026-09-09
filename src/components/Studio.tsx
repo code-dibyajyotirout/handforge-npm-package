@@ -894,12 +894,13 @@ export default function Studio() {
           <div className="panel-section">
             <h3>SPATIAL GESTURES</h3>
             <ul className="gesture-guide">
-              <li><span className="guide-icon">[Pinch]</span><div className="guide-text"><strong>Hand 1 Pinch:</strong> Deform model surface</div></li>
-              <li><span className="guide-icon">[Palm]</span><div className="guide-text"><strong>Hand 1 Flat:</strong> Laplacian smooth pass</div></li>
-              <li><span className="guide-icon">[Fist]</span><div className="guide-text"><strong>Hand 2 Fist:</strong> Rotate model (Orbit)</div></li>
-              <li><span className="guide-icon">[Scale]</span><div className="guide-text"><strong>Hand 2 Pinch:</strong> Scale model (Resize)</div></li>
-              <li><span className="guide-icon">[Undo]</span><div className="guide-text"><strong>Thumbs Up:</strong> Undo last stroke (Gesture)</div></li>
-              <li><span className="guide-icon">[Brush]</span><div className="guide-text"><strong>3-Fingers:</strong> Cycle sculpt brush (Gesture)</div></li>
+              <li><span className="guide-icon">☝</span><div className="guide-text"><strong>Point:</strong> Hover & aim 3D target ring</div></li>
+              <li><span className="guide-icon">🤏</span><div className="guide-text"><strong>Pinch:</strong> Deform & sculpt clay surface</div></li>
+              <li><span className="guide-icon">✋</span><div className="guide-text"><strong>Open Palm:</strong> Laplacian smooth pass</div></li>
+              <li><span className="guide-icon">✊</span><div className="guide-text"><strong>Fist:</strong> Rotate & orbit 3D model</div></li>
+              <li><span className="guide-icon">✌</span><div className="guide-text"><strong>Two Fingers:</strong> Scale / resize model</div></li>
+              <li><span className="guide-icon">👍</span><div className="guide-text"><strong>Thumbs Up:</strong> Undo last sculpt stroke</div></li>
+              <li><span className="guide-icon">🤟</span><div className="guide-text"><strong>3-Fingers:</strong> Cycle active brush tool</div></li>
             </ul>
           </div>
         </aside>
