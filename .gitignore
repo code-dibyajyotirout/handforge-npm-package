@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.next/
+out/
+.env*
+.npmrc
+*.log
+*.DS_Store
+.turbo/

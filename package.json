@@ -1,0 +1,102 @@
+{
+  "name": "handforge",
+  "version": "1.0.0",
+  "description": "Browser-native spatial 3D digital sculpting and animation studio engine with real-time gesture tracking, GPU-accelerated vertex deformation, and adaptive One Euro Filter signal smoothing.",
+  "license": "AGPL-3.0-only",
+  "author": "Dibyajyoti Rout <code.dibyajyotirout@gmail.com>",
+  "homepage": "https://github.com/code-dibyajyotirout/handforge#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-dibyajyotirout/handforge-npm-package.git"
+  },
+  "bugs": {
+    "url": "https://github.com/code-dibyajyotirout/handforge-npm-package/issues"
+  },
+  "keywords": [
+    "3d-sculpting",
+    "threejs",
+    "webgl",
+    "webgpu",
+    "mediapipe",
+    "gesture-control",
+    "spatial-computing",
+    "one-euro-filter",
+    "vertex-deformation",
+    "computer-vision",
+    "agpl"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine/index.d.ts",
+      "import": "./dist/engine/index.mjs",
+      "require": "./dist/engine/index.js",
+      "default": "./dist/engine/index.js"
+    },
+    "./math": {
+      "types": "./dist/math/index.d.ts",
+      "import": "./dist/math/index.mjs",
+      "require": "./dist/math/index.js",
+      "default": "./dist/math/index.js"
+    },
+    "./vision": {
+      "types": "./dist/vision/index.d.ts",
+      "import": "./dist/vision/index.mjs",
+      "require": "./dist/vision/index.js",
+      "default": "./dist/vision/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js",
+      "default": "./dist/components/index.js"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "node scripts/build-lib.js",
+    "test": "node --test tests/*.test.mjs",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "three": ">=0.150.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.22-rc.20250304"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.170.0",
+    "three": "^0.170.0",
+    "typescript": "^5.4.5"
+  }
+}
